@@ -2,58 +2,77 @@ class AllList{
   static List<Map<String, dynamic>> userDataList = [
     {
       "userName": "John Doe",
-      "city": "New York",
-      "email": "john.doe@example.com",
-      "age": 35,
-      "isFav": false,
-      "extraDetails":
-      "John Doe is a software engineer based in New York. He specializes in mobile app development and has a passion for creating intuitive user experiences. In his free time, John enjoys hiking, photography, and exploring the city's diverse culinary scene. He is also a volunteer at local coding bootcamps, mentoring young programmers. John values meaningful connections and is a firm believer in lifelong learning. He enjoys reading about technology trends and traveling to broaden his perspectives. His optimistic and collaborative nature makes him a favorite among his peers. John is driven by a desire to create innovative solutions."
+      "address": "123 Elm Street, Springfield",
+      "email": "johndoe@example.com",
+      "mobileNo": "1234567890",
+      "city": "Mumbai",
+      "gender": "Male",
+      "dob": "15/01/1990",
+      "age": 33,
+      "isFav": 0,
+      "extraDetails": "John is an adventurous soul who thrives on outdoor activities such as hiking, rock climbing, and camping. He is passionate about connecting with nature and enjoys traveling to remote destinations to explore new terrains. In his spare time, John loves photography and has built an impressive portfolio of landscape and wildlife photos. He is a fitness enthusiast and practices yoga to maintain both physical and mental well-being. John also volunteers at local animal shelters, showcasing his kind and compassionate nature. Professionally, he works as a software engineer and is highly skilled in developing innovative solutions. His friends describe him as a reliable, fun-loving individual who is always ready to lend a helping hand."
     },
     {
       "userName": "Jane Smith",
-      "city": "Los Angeles",
-      "email": "jane.smith@example.com",
+      "address": "456 Maple Avenue, Metropolis",
+      "email": "janesmith@example.com",
+      "mobileNo": "0987654321",
+      "city": "Delhi",
+      "gender": "Female",
+      "dob": "22/03/1995",
+      "age": 28,
+      "isFav": 0,
+      "extraDetails": "Jane is a creative and curious individual who spends her weekends reading novels and experimenting in the kitchen with new recipes. She has a deep appreciation for literature and enjoys sharing her reviews on her personal blog. Jane is also a talented artist who loves painting landscapes, drawing inspiration from her travels. Her work has been featured in local art galleries. Besides her creative pursuits, she is a marketing professional who excels in crafting engaging campaigns. Jane has a soft spot for animals and has adopted two rescue cats. She is known among her peers for her positive energy, quick wit, and ability to light up any room she enters. Jane dreams of traveling the world and exploring diverse cultures."
+    },
+    {
+      "userName": "Rajesh Kumar",
+      "address": "789 Oak Drive, Mumbai",
+      "email": "rajeshkumar@example.com",
+      "mobileNo": "9876543210",
+      "city": "Bangalore",
+      "gender": "Male",
+      "dob": "07/10/1988",
+      "age": 35,
+      "isFav": 0,
+      "extraDetails": "Rajesh is a tech enthusiast with a knack for staying updated on the latest advancements in technology. He enjoys building gadgets and experimenting with new software tools in his free time. His weekends are often spent playing cricket with his local team or watching matches with friends. Rajesh is a foodie at heart and loves exploring street food across different cities. He is a strong advocate for education and volunteers to teach coding to underprivileged kids. His sense of humor and easygoing nature make him a favorite among his peers. Rajesh values family and traditions, often organizing get-togethers for loved ones."
+    },
+    {
+      "userName": "Priya Singh",
+      "address": "101 Pine Street, Delhi",
+      "email": "priyasingh@example.com",
+      "mobileNo": "8765432109",
+      "city": "Chennai",
+      "gender": "Female",
+      "dob": "15/01/1990",
       "age": 31,
-      "isFav": false,
-      "extraDetails":
-      "Jane Smith is a marketing manager from Los Angeles with a flair for creativity and innovation. She is skilled in brand strategy and digital campaigns, helping businesses grow their online presence. Jane loves art and often visits local galleries to find inspiration for her work. Outside of her profession, she is an avid runner and has completed multiple marathons. Jane is known for her dedication to her goals and her ability to inspire others. She volunteers at animal shelters on weekends and is passionate about sustainability. Her warm personality and leadership qualities make her a valued team member."
+      "isFav": 0,
+      "extraDetails": "Priya is a driven individual who balances her professional life as a data analyst with her passion for music and dance. She has trained in classical Indian dance and enjoys performing at cultural events. In addition to her artistic pursuits, Priya is an advocate for mental health awareness and frequently participates in workshops and campaigns to support this cause. She loves spending her evenings journaling or exploring new cuisines. Her favorite way to relax is by binge-watching crime dramas or curling up with a good book. Priya's friends and family admire her thoughtful, compassionate, and goal-oriented personality. She dreams of starting her own foundation to empower women in rural areas."
     },
     {
-      "userName": "Michael Johnson",
-      "city": "Chicago",
-      "email": "michael.johnson@example.com",
+      "userName": "Sandeep Sharma",
+      "address": "202 Oakwood Road, Delhi",
+      "email": "sandeep.sharma@example.com",
+      "mobileNo": "9123456789",
+      "city": "Mumbai",
+      "gender": "Male",
+      "dob": "15/01/1990",
       "age": 39,
-      "isFav": false,
-      "extraDetails":
-      "Michael Johnson is a financial analyst from Chicago who specializes in investment strategies and portfolio management. He has a strong analytical mind and enjoys solving complex financial challenges. Michael is a fitness enthusiast who spends his mornings at the gym and weekends cycling along Lake Michigan. He is also a jazz music aficionado and frequently attends live performances. Michael is a mentor for aspiring financial professionals, sharing his knowledge and experience. He is admired for his strategic thinking and calm demeanor. A family-oriented individual, Michael values spending quality time with loved ones and cherishes his community connections."
+      "isFav": 0,
+      "extraDetails": "Sandeep is a highly motivated individual with a passion for technology and entrepreneurship. He has successfully launched a tech startup that focuses on sustainable energy solutions. Outside of work, Sandeep enjoys spending time with his family, traveling to new destinations, and experiencing different cultures. He is a foodie who loves experimenting with new cuisines and trying out local delicacies during his travels. Sandeep is an advocate for environmental conservation and often participates in community-based green initiatives. His friends describe him as a dynamic and forward-thinking individual with a strong commitment to making a positive impact on the world."
     },
     {
-      "userName": "Emily Davis",
-      "city": "San Francisco",
-      "email": "emily.davis@example.com",
-      "age": 29,
-      "isFav": false,
-      "extraDetails":
-      "Emily Davis is a graphic designer from San Francisco with a keen eye for detail and creativity. She specializes in user interface design and works with tech startups to enhance their visual branding. Emily loves exploring the city's vibrant art scene and is a member of a local photography club. She is passionate about environmental causes and actively participates in beach clean-up drives. Emily is known for her innovative designs and collaborative work ethic. She enjoys reading fiction and experimenting with new cooking recipes. Her positivity and artistic talent make her a beloved colleague and friend to many."
-    },
-    {
-      "userName": "David Wilson",
-      "city": "Seattle",
-      "email": "david.wilson@example.com",
-      "age": 36,
-      "isFav": false,
-      "extraDetails":
-      "David Wilson is a project manager from Seattle with extensive experience in technology projects. He is a natural problem-solver and excels in coordinating teams to achieve their goals. David enjoys the outdoors and often goes camping in the Pacific Northwest. He is an amateur photographer and loves capturing scenic landscapes. He is actively involved in his community, organizing workshops on time management and leadership skills. David is also a music enthusiast and plays the guitar in his free time. His dedication, strategic mindset, and sense of humor make him a respected professional and a great friend."
-    },
-    {
-      "userName": "Sophia Martinez",
-      "city": "Miami",
-      "email": "sophia.martinez@example.com",
-      "age": 26,
-      "isFav": true,
-      "extraDetails":
-      "Sophia Martinez is a fashion designer from Miami with a passion for sustainable fashion. She creates unique designs that blend modern trends with eco-friendly materials. Sophia enjoys attending fashion shows and collaborating with local artists. In her spare time, she practices yoga and explores new cuisines. She is an advocate for mental health awareness and frequently volunteers at community events. Sophia is admired for her creativity, empathy, and entrepreneurial spirit. She dreams of launching her own fashion brand that promotes ethical practices. Her innovative approach and cheerful personality inspire those around her to think differently and embrace individuality."
+      "userName": "Anita Reddy",
+      "address": "303 Riverside Drive, Chennai",
+      "email": "anita.reddy@example.com",
+      "mobileNo": "9988776655",
+      "city": "Chennai",
+      "gender": "Female",
+      "dob": "15/01/1990",
+      "age": 34,
+      "isFav": 0,
+      "extraDetails": "Anita is a passionate writer and storyteller with a deep love for literature. She spends her free time crafting short stories and poetry, often drawing inspiration from her personal experiences and the people she meets. Anita is also a social worker who advocates for women's rights and empowerment. She works with several NGOs to improve the lives of women and children in underprivileged communities. In her downtime, Anita enjoys hiking, practicing yoga, and spending time with her family. Her friends admire her empathetic nature and her ability to make people feel heard and valued."
     }
-  ];
+  ]
+  ;
 
 }

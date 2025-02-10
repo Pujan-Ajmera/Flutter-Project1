@@ -1,5 +1,8 @@
+
 import 'package:flutter/material.dart';
-import 'package:matrimony/allpages/dashboard.dart';
+
+import 'allpages/dashboard.dart';
+
 void main() {
   runApp(const MyApp());
 }

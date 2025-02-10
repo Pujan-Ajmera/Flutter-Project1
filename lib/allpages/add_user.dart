@@ -1,16 +1,24 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../database/database.dart';
+
 class AddUser extends StatefulWidget {
+  List<Map<String, dynamic>> userDataList;
+  int? editIndex;
+
+  AddUser({required this.userDataList, this.editIndex});
+
   @override
   _AddUserState createState() => _AddUserState();
 }
 
 class _AddUserState extends State<AddUser> {
+
+  MyDatabase databse = MyDatabase();
   String? selectedCity = "City";
   String? selectedGender = "Gender";
 
@@ -32,6 +40,21 @@ class _AddUserState extends State<AddUser> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.editIndex != null) {
+      var userData = widget.userDataList[widget.editIndex!];
+      fullNameController.text = userData["userName"];
+      addressController.text = userData["address"];
+      emailController.text = userData["email"];
+      mobileController.text = userData["mobileNo"];
+      selectedCity = userData["city"];
+      selectedGender = userData["gender"];
+      dobController.text = userData["dob"];
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -45,7 +68,9 @@ class _AddUserState extends State<AddUser> {
                 padding: EdgeInsets.all(16),
                 children: [
                   Text(
-                    "Start Your Love Story",
+                    widget.editIndex == null
+                        ? "Start Your Love Story"
+                        : "Edit Your Details",
                     style: GoogleFonts.satisfy(
                       textStyle: TextStyle(color: Colors.white, fontSize: 40),
                     ),
@@ -108,11 +133,7 @@ class _AddUserState extends State<AddUser> {
   Widget _buildEmailField() {
     return TextFormField(
       controller: emailController,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(10),
-      ],
+      keyboardType: TextInputType.emailAddress,
       validator: (value) {
         final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
         if (value == null || value.isEmpty) {
@@ -138,6 +159,7 @@ class _AddUserState extends State<AddUser> {
       ),
     );
   }
+
   Widget _buildMobileField() {
     return TextFormField(
       controller: mobileController,
@@ -271,12 +293,13 @@ class _AddUserState extends State<AddUser> {
       }).toList(),
     );
   }
+
   Widget _buildActionButtons() {
     return Row(
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState?.validate() ?? false) {
                 String fullName = fullNameController.text;
                 String address = addressController.text;
@@ -290,51 +313,47 @@ class _AddUserState extends State<AddUser> {
                     .map((entry) => entry.key)
                     .toList();
 
-                String data = 'Full Name: $fullName\n'
-                    'Address: $address\n'
-                    'Email: $email\n'
-                    'Mobile: $mobile\n'
-                    'City: $city\n'
-                    'Gender: $gender\n'
-                    'Date of Birth: $dob\n'
-                    'Hobbies: ${selectedHobbies.join(", ")}\n\n';
+                // Calculate age from DOB
+                final dobDate = DateFormat('dd/MM/yyyy').parse(dob);
+                final age = DateTime.now().difference(dobDate).inDays ~/ 365.25;
 
-                print(data);
-                appendDataToFile(data);
+                Map<String, dynamic> newUser = {
+                  "userName": fullName,
+                  "address": address,
+                  "email": email,
+                  "mobileNo": mobile,
+                  "city": city,
+                  "gender": gender,
+                  "dob": dob,
+                  "hobbies": selectedHobbies.join(","),
+                  "age": age,
+                  "isFav":0,
+                  "extraDetails":"my name is ${fullName} i live at ${address} you can contact me at ${email} and at ${mobile} i live at the city named ${city} my gender is ${gender} my hobbies are ${hobbies} and i good}"
+                };
 
-                print("Form is valid! Data appended.");
-              } else {
-                print("Form is invalid!");
+                if (widget.editIndex != null) {
+                  // widget.userDataList[widget.editIndex!] = newUser;
+                  print("${newUser} updated");
+                  Navigator.pop(context,newUser);
+                } else {
+                  await databse.insertUser(newUser);
+                  // Add new user
+                  widget.userDataList.add(newUser);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added User'),
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: Color.fromRGBO(13, 24, 33, 1),
             ),
-            child: Text("Save"),
-          ),
-        ),
-        SizedBox(width: 10),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              _formKey.currentState?.reset();
-              fullNameController.clear();
-              addressController.clear();
-              emailController.clear();
-              mobileController.clear();
-              dobController.clear();
-              passwordController.clear();
-              confirmPasswordController.clear();
-              setState(() {
-                hobbies.updateAll((key, value) => false);
-                selectedCity = "City";
-                selectedGender = "Gender";
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey,
+            child: Text(
+              widget.editIndex == null ? "Submit" : "Save",
+              style: TextStyle(fontSize: 18),
             ),
-            child: Text("Reset"),
           ),
         ),
       ],
@@ -343,36 +362,21 @@ class _AddUserState extends State<AddUser> {
 
   List<DropdownMenuItem<String>> getDropDownListItems() {
     return [
-      DropdownMenuItem(child: Text("City"), value: "City"),
-      DropdownMenuItem(child: Text("Ahmedabad"), value: "Ahmedabad"),
-      DropdownMenuItem(child: Text("Surat"), value: "Surat"),
+      DropdownMenuItem(value: "City", child: Text("City")),
+      DropdownMenuItem(value: "Mumbai", child: Text("Mumbai")),
+      DropdownMenuItem(value: "Delhi", child: Text("Delhi")),
+      DropdownMenuItem(value: "Bangalore", child: Text("Bangalore")),
+      DropdownMenuItem(value: "Chennai", child: Text("Chennai")),
     ];
   }
 
   List<DropdownMenuItem<String>> _genderItems() {
     return [
-      DropdownMenuItem(child: Text("Gender"), value: "Gender"),
-      DropdownMenuItem(child: Text("Male"), value: "Male"),
-      DropdownMenuItem(child: Text("Female"), value: "Female"),
-      DropdownMenuItem(child: Text("Other"), value: "Other"),
+      DropdownMenuItem(value: "Gender", child: Text("Gender")),
+      DropdownMenuItem(value: "Male", child: Text("Male")),
+      DropdownMenuItem(value: "Female", child: Text("Female")),
+      DropdownMenuItem(value: "Other", child: Text("Other")),
     ];
-  }
-}
-
-Future<void> appendDataToFile(String data) async {
-  try {
-    final filePath = 'lib/allpages/user_info.txt';
-
-    final file = File(filePath);
-
-    if (!await file.exists()) {
-      await file.create(recursive: true);
-    }
-
-    await file.writeAsString('$data\n', mode: FileMode.append);
-    print('Data appended successfully!');
-  } catch (e) {
-    print('Error appending data to the file: $e');
   }
 }
 

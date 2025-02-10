@@ -1,216 +1,382 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 class Favourit extends StatefulWidget {
+  List<Map<String, dynamic>> userDataList;
+  Favourit({required this.userDataList});
+
   @override
   State<Favourit> createState() => _Favourit();
 }
 
 class _Favourit extends State<Favourit> {
-  List<Map<String, dynamic>> userDataList = [
-    {
-      "userName": "John Doe",
-      "city": "New York",
-      "email": "john.doe@example.com",
-      "mobileNumber": "1234567890",
-      "dateOfBirth": "1990-01-01",
-      "gender": "Male",
-      "age": 35,
-      "isFav": false,
-    },
-    {
-      "userName": "Jane Smith",
-      "city": "Los Angeles",
-      "email": "jane.smith@example.com",
-      "mobileNumber": "9876543210",
-      "dateOfBirth": "1992-05-14",
-      "gender": "Female",
-      "age": 31,
-      "isFav": false,
-    },
-    {
-      "userName": "Michael Johnson",
-      "city": "Chicago",
-      "email": "michael.johnson@example.com",
-      "mobileNumber": "4561237890",
-      "dateOfBirth": "1985-12-22",
-      "gender": "Male",
-      "age": 39,
-      "isFav": false,
-    },
-    {
-      "userName": "Emily Davis",
-      "city": "San Francisco",
-      "email": "emily.davis@example.com",
-      "mobileNumber": "7891234560",
-      "dateOfBirth": "1995-03-10",
-      "gender": "Female",
-      "age": 29,
-      "isFav": false,
-    },
-    {
-      "userName": "David Wilson",
-      "city": "Seattle",
-      "email": "david.wilson@example.com",
-      "mobileNumber": "6547891230",
-      "dateOfBirth": "1988-07-20",
-      "gender": "Male",
-      "age": 36,
-      "isFav": false,
-    },
-    {
-      "userName": "Sophia Martinez",
-      "city": "Miami",
-      "email": "sophia.martinez@example.com",
-      "mobileNumber": "3219876540",
-      "dateOfBirth": "1998-11-02",
-      "gender": "Female",
-      "age": 26,
-      "isFav": true,
-    }
-  ];
-  _Favourit(){
-    userDataList  = userDataList.where((item)=>item["isFav"]==true).toList();
+  List<Map<String, dynamic>>? userDataList;
+
+  @override
+  void initState() {
+    super.initState();
+    userDataList = widget.userDataList.where((item) => (item["isFav"] ?? 0) == 1).toList();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Center(
           child: Text(
-            "Profiles Awaiting Marriage Confirmation",
+            "Loved Ones",
             style: GoogleFonts.b612(
-              textStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-        backgroundColor: Color.fromRGBO(13, 24, 33, 1),
+        backgroundColor: const Color.fromRGBO(13, 24, 33, 1),
       ),
-      body: Stack(
+      body: userDataList == null || userDataList!.isEmpty
+          ? Center(
+        child: Text(
+          "No favorite profiles found!",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+      )
+          : Stack(
         children: [
-          Container(color: Color.fromRGBO(13, 24, 33, 1)),
-          ListView.builder(itemBuilder: (context, index) {
-            return Column(
-              children: [
-                SizedBox(height: 25,),
-                Center(
-                  child: Card(
-                    color: const Color(0xFF1E2A38),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+          Container(color: const Color.fromRGBO(13, 24, 33, 1)),
+          ListView.builder(
+            itemCount: userDataList!.length,
+            itemBuilder: (context, index) {
+              return Dismissible(
+                key: Key(userDataList![index]["userName"]),
+                confirmDismiss: (direction) async {
+                  return await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text("Confirm Deletion"),
+                      content: Text("Are you sure you want to delete ${userDataList![index]["userName"]}?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: Text("Delete", style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
                     ),
-                    elevation: 10,
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  const CircleAvatar(
-                                    backgroundColor: Colors.blueGrey,
-                                    radius: 28,
-                                    child: Icon(Icons.person, size: 32, color: Colors.white),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    userDataList[index]["userName"] ?? "N/A",
+                  );
+                },
+                onDismissed: (direction) {
+                  final deletedItem = userDataList![index]; // Store the deleted item
+                  final deletedIndex = index;
+
+                  setState(() {
+                    // Toggle favorite using integer logic: 1 becomes 0, 0 becomes 1
+                    userDataList![index]["isFav"] = 1 - (userDataList![index]["isFav"] ?? 0);
+                    userDataList!.removeAt(index);
+                  });
+
+                  // Show a snackbar with an undo action
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${deletedItem["userName"]} dismissed'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          setState(() {
+                            userDataList!.insert(deletedIndex, deletedItem);
+                            userDataList![deletedIndex]["isFav"] =
+                                1 - (userDataList![deletedIndex]["isFav"] ?? 0);
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: const Color(0xFF1E2A38),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (BuildContext context) {
+                        return SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Text(
+                                    widget.userDataList[index]["userName"] ?? "N/A",
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
-                                ],
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  userDataList[index]["isFav"] ? Icons.favorite : Icons.favorite_border,
-                                  color: Colors.redAccent,
-                                  size: 28,
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    userDataList[index]["isFav"] = !userDataList[index]["isFav"];
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          ListTile(
-                            leading: const Icon(Icons.location_city, color: Colors.blueAccent),
-                            title: const Text("City", style: TextStyle(color: Colors.grey)),
-                            subtitle: Text(userDataList[index]["city"] ?? "N/A", style: const TextStyle(color: Colors.white)),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.email, color: Colors.orangeAccent),
-                            title: const Text("Email", style: TextStyle(color: Colors.grey)),
-                            subtitle: Text(userDataList[index]["email"] ?? "N/A", style: const TextStyle(color: Colors.white)),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.phone, color: Colors.greenAccent),
-                            title: const Text("Mobile Number", style: TextStyle(color: Colors.grey)),
-                            subtitle: Text(userDataList[index]["mobileNumber"] ?? "N/A", style: const TextStyle(color: Colors.white)),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.cake, color: Colors.pinkAccent),
-                            title: const Text("Date of Birth", style: TextStyle(color: Colors.grey)),
-                            subtitle: Text(userDataList[index]["dateOfBirth"] ?? "N/A", style: const TextStyle(color: Colors.white)),
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              userDataList[index]["gender"] == "Male" ? Icons.male : Icons.female,
-                              color: Colors.lightBlueAccent,
+                                const SizedBox(height: 10),
+                                Divider(color: Colors.grey[600], thickness: 1),
+                                const SizedBox(height: 10),
+                                Text(
+                                  userDataList![index]["extraDetails"] ??
+                                      "My name is ${widget.userDataList[index]["fullName"]}\n My age is ${widget.userDataList[index]["age"]}\n My email is ${widget.userDataList[index]["email"]}\n My city is ${widget.userDataList[index]["city"]}\n ",
+                                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                                ),
+                                const SizedBox(height: 10),
+                                Divider(color: Colors.grey[600], thickness: 1),
+                                // Favorite Status
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(Icons.favorite, color: Colors.redAccent),
+                                        title: Text(
+                                          "Favorite: ${ (widget.userDataList[index]["isFav"] ?? 0) == 1 ? "Yes" : "No" }",
+                                          style: TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons.mobile_screen_share_outlined, color: Colors.blueAccent),
+                                        title: Text(
+                                          "Mo.: ${widget.userDataList[index]["mobileNo"]}",
+                                          style: TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons.accessibility, color: Colors.cyan),
+                                        title: Text(
+                                          "Gender: ${widget.userDataList[index]["gender"]}",
+                                          style: TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons.email, color: Colors.purple),
+                                        title: Text(
+                                          "Email: ${widget.userDataList[index]["email"] ?? "N/A"}",
+                                          style: TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons.location_city, color: Colors.yellow),
+                                        title: Text(
+                                          "City: ${widget.userDataList[index]["city"] ?? "N/A"}",
+                                          style: TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons.cake, color: Colors.green),
+                                        title: Text(
+                                          "Age: ${widget.userDataList[index]["age"] ?? "N/A"}",
+                                          style: TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                // Close Button
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blueAccent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text("Close", style: TextStyle(color: Colors.white)),
+                                  ),
+                                ),
+                              ],
                             ),
-                            title: const Text("Gender", style: TextStyle(color: Colors.grey)),
-                            subtitle: Text(userDataList[index]["gender"] ?? "N/A", style: const TextStyle(color: Colors.white)),
                           ),
-                          ListTile(
-                            leading: const Icon(Icons.timeline, color: Colors.purpleAccent),
-                            title: const Text("Age", style: TextStyle(color: Colors.grey)),
-                            subtitle: Text("${userDataList[index]["age"] ?? "N/A"}", style: const TextStyle(color: Colors.white)),
+                        );
+                      },
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Card(
+                          color: const Color(0xFF1E2A38),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton.icon(
-                                onPressed: () {
-                                },
-                                icon: const Icon(Icons.edit, color: Colors.blue),
-                                label: const Text("Edit", style: TextStyle(color: Colors.white)),
-                              ),
-                              TextButton.icon(
-                                onPressed: () {
-                                },
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                label: const Text("Delete", style: TextStyle(color: Colors.white)),
-                              ),
-                            ],
+                          elevation: 5,
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Row for Name and Gender Icon
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        // Gender Icon (based on gender)
+                                        Icon(
+                                          userDataList![index]["gender"] == "Male" ? Icons.male : Icons.female,
+                                          color: userDataList![index]["gender"] == "Male" ? Colors.blue : Colors.pink,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        // Username
+                                        Text(
+                                          userDataList![index]["userName"] ?? "N/A",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Heart Icon for Toggling Favorite
+                                    IconButton(
+                                      icon: Icon(
+                                        (userDataList![index]["isFav"] ?? 0) == 1
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color: Colors.redAccent,
+                                        size: 24,
+                                      ),
+                                      onPressed: () async {
+                                        bool? confirmAction = await showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: Text("Confirm Action"),
+                                            content: Text(
+                                              (userDataList![index]["isFav"] ?? 0) == 1
+                                                  ? "Remove ${userDataList![index]["userName"]} from favorites?"
+                                                  : "Add ${userDataList![index]["userName"]} to favorites?",
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(false),
+                                                child: Text("Cancel"),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(true),
+                                                child: Text(
+                                                  (userDataList![index]["isFav"] ?? 0) == 1 ? "Remove" : "Add",
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+
+                                        if (confirmAction == true) {
+                                          final removedUser = userDataList![index]; // Store for undo
+                                          final removedIndex = index;
+
+                                          setState(() {
+                                            // Toggle favorite using integer logic
+                                            userDataList![index]["isFav"] = 1 - (userDataList![index]["isFav"] ?? 0);
+                                            if ((userDataList![index]["isFav"] ?? 0) == 0) {
+                                              userDataList!.removeAt(index);
+                                            }
+                                          });
+
+                                          // Show a snackbar with an undo option
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                (userDataList![index]["isFav"] ?? 0) == 1
+                                                    ? '${removedUser["userName"]} added to favorites'
+                                                    : '${removedUser["userName"]} removed',
+                                              ),
+                                              action: SnackBarAction(
+                                                label: 'Undo',
+                                                onPressed: () {
+                                                  setState(() {
+                                                    userDataList!.insert(removedIndex, removedUser);
+                                                    userDataList![removedIndex]["isFav"] = 1;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                // City, Email, Age row
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.location_city, color: Colors.yellow, size: 18),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "${userDataList![index]["city"] ?? "N/A"}",
+                                            style: const TextStyle(fontSize: 14, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.email, color: Colors.green, size: 18),
+                                          SizedBox(width: 5),
+                                          Expanded(
+                                            child: Text(
+                                              "${userDataList![index]["email"] ?? "N/A"}",
+                                              style: const TextStyle(fontSize: 14, color: Colors.white),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.calendar_today, color: Colors.blue, size: 18),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            "${userDataList![index]["age"] ?? "N/A"}",
+                                            style: const TextStyle(fontSize: 14, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
-            )
-            ;
-          },itemCount: userDataList.length,)
+              );
+            },
+          ),
         ],
       ),
     );
-
   }
 }
-

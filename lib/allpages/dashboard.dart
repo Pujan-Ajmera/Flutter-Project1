@@ -3,6 +3,9 @@ import 'package:matrimony/allpages/about_us_page.dart';
 import 'package:matrimony/allpages/add_user.dart';
 import 'package:matrimony/allpages/favourit.dart';
 import 'package:matrimony/allpages/userList.dart';
+
+import 'all_list.dart';
+import 'edit_button.dart';
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -12,7 +15,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int selectedBox = 0;
-  List<Widget> pages = [AddUser(),Userlist(),Favourit(),AboutUsPage()];
+  List<Widget> pages = [AddUser(userDataList: AllList.userDataList,),Userlist(userDataList: AllList.userDataList,),Favourit(userDataList: AllList.userDataList,),AboutUsPage(),EditButton(userDataList: AllList.userDataList,)];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +46,10 @@ class _DashboardState extends State<Dashboard> {
           BottomNavigationBarItem(
             icon: Icon(Icons.account_box_sharp),
             label: "about us",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_calendar_rounded),
+            label: "Edit Users",
           ),
         ],
         currentIndex: selectedBox,
