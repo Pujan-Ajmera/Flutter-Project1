@@ -1,0 +1,49 @@
+void _showAddUserDialog() {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Add New User"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(labelText: "Name"),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // Close dialog
+            child: Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              String name = nameController.text.trim();
+              String email = emailController.text.trim();
+
+              if (name.isNotEmpty && email.isNotEmpty) {
+                await db.insertUser({"user_name": name, "user_email": email});
+                setState(() {
+                  usersFuture = db.getAllUsers(); // Refresh list
+                });
+                Navigator.pop(context); // Close dialog
+              }
+            },
+            child: Text("Add"),
+          ),
+        ],
+      );
+    },
+  );
+}
